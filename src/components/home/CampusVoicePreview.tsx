@@ -6,6 +6,7 @@ import { CampusVoicePost } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { formatDate } from "@/lib/utils";
 import { MessageSquare, ThumbsUp, MessageCircle, ArrowRight } from "lucide-react";
+import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 
 export function CampusVoicePreview() {
   const [posts, setPosts] = useState<CampusVoicePost[]>([]);
@@ -28,7 +29,7 @@ export function CampusVoicePreview() {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+        <RevealOnScroll className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600 uppercase tracking-wider">
               <MessageSquare className="w-4 h-4" />
@@ -49,7 +50,7 @@ export function CampusVoicePreview() {
             <span>Open Forum</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-        </div>
+        </RevealOnScroll>
 
         {loading ? (
           <div className="py-8 text-center text-xs text-slate-400">Loading discussions...</div>

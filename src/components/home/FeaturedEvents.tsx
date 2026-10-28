@@ -8,6 +8,7 @@ import { EventCard } from "@/components/events/EventCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Calendar, ArrowRight, RefreshCw, AlertCircle } from "lucide-react";
+import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 
 export function FeaturedEvents() {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -44,7 +45,7 @@ export function FeaturedEvents() {
     <section className="py-16 bg-white border-y border-slate-200/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+        <RevealOnScroll className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 uppercase tracking-wider">
               <Calendar className="w-4 h-4" />
@@ -74,7 +75,7 @@ export function FeaturedEvents() {
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
-        </div>
+        </RevealOnScroll>
 
         {/* Content State */}
         {loading ? (

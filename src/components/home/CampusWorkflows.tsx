@@ -1,170 +1,150 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
-  GraduationCap,
-  ShieldAlert,
-  CalendarCheck,
-  Award,
+  Compass,
   QrCode,
-  Users,
-  FileCheck2,
-  CheckCircle,
+  Award,
   ArrowRight,
-  Sparkles,
+  Workflow,
+  CheckCircle2,
 } from "lucide-react";
+import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 
 export function CampusWorkflows() {
-  const [activePersona, setActivePersona] = useState<"student" | "admin">("student");
-
-  const studentSteps = [
+  const steps = [
     {
-      title: "Discover & RSVP to Events",
-      description: "Browse verified campus activities across academic, cultural, and sports societies.",
-      icon: CalendarCheck,
-      action: "Browse Events",
+      stepNumber: "01",
+      title: "Discover & Connect",
+      headline: "Explore Verified Campus Opportunities",
+      description:
+        "Browse university-wide events, chartered student societies, and open leadership recruitment drives through a single verified platform.",
+      icon: Compass,
+      accent: {
+        number: "text-blue-600 bg-blue-50 border-blue-200",
+        icon: "text-blue-600",
+        border: "border-blue-200/80 hover:border-blue-300",
+      },
+      actionText: "Browse Events Feed",
       href: "/events",
+      highlights: ["Official event calendar", "Student club directory", "Executive role applications"],
     },
     {
-      title: "Fast QR Check-in",
-      description: "Scan or enter the dynamic session token during live events to confirm real presence.",
+      stepNumber: "02",
+      title: "Attend & Validate",
+      headline: "Dynamic QR Attendance Check-In",
+      description:
+        "Confirm your presence during live events with time-bound dynamic session tokens. Anti-proxy mechanisms ensure verified attendance records.",
       icon: QrCode,
-      action: "Check-in Portal",
+      accent: {
+        number: "text-indigo-600 bg-indigo-50 border-indigo-200",
+        icon: "text-indigo-600",
+        border: "border-indigo-200/80 hover:border-indigo-300",
+      },
+      actionText: "Attendance Portal",
       href: "/dashboard?tab=attendance",
+      highlights: ["Time-limited session tokens", "Proxy-proof check-ins", "Faculty coordinator audit logs"],
     },
     {
-      title: "Earn Official Certificates",
-      description: "Receive verifiable PDF certificates directly to your student record after attending events.",
+      stepNumber: "03",
+      title: "Earn & Verify",
+      headline: "Official Credential Registry",
+      description:
+        "Earn official digital certificates deposited directly into your student portfolio, with instant online verification codes for recruiters.",
       icon: Award,
-      action: "My Certificates",
-      href: "/dashboard?tab=certificates",
-    },
-    {
-      title: "Join Student Leadership",
-      description: "Apply for club executive positions with structured SOPs and track interview statuses.",
-      icon: Users,
-      action: "Recruitment Drives",
-      href: "/recruitment",
+      accent: {
+        number: "text-cyan-700 bg-cyan-50 border-cyan-200",
+        icon: "text-cyan-600",
+        border: "border-cyan-200/80 hover:border-cyan-300",
+      },
+      actionText: "Verify Credentials",
+      href: "/verify",
+      highlights: ["Downloadable vector PDFs", "Public verification lookups", "Revocation audit records"],
     },
   ];
-
-  const adminSteps = [
-    {
-      title: "Design Certificate Templates",
-      description: "Upload backgrounds, configure field coordinates, fonts, and verification QR placements.",
-      icon: FileCheck2,
-      action: "Certificate Studio",
-      href: "/dashboard?tab=certificate-studio",
-    },
-    {
-      title: "Live Dynamic Attendance",
-      description: "Launch time-bound cryptographic QR check-in sessions with proxy-proof verification.",
-      icon: QrCode,
-      action: "Launch Session",
-      href: "/dashboard?tab=attendance",
-    },
-    {
-      title: "Bulk Certificate Issuance",
-      description: "Preview eligible attendees, skip duplicates, and batch-issue with email delivery status.",
-      icon: Award,
-      action: "Bulk Issue",
-      href: "/dashboard?tab=certificate-studio",
-    },
-    {
-      title: "Faculty Approval Governance",
-      description: "Audit pending event submissions, request capacity adjustments, or approve schedules.",
-      icon: ShieldAlert,
-      action: "Review Queue",
-      href: "/dashboard?tab=approvals",
-    },
-  ];
-
-  const activeSteps = activePersona === "student" ? studentSteps : adminSteps;
 
   return (
-    <section className="py-20 bg-slate-50/70 border-b border-slate-200/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <section className="py-24 bg-white border-b border-slate-200/80 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Unified University Workflows</span>
+        <RevealOnScroll className="text-center max-w-3xl mx-auto space-y-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold">
+            <Workflow className="w-3.5 h-3.5 text-indigo-600" />
+            <span>THE STUDENT JOURNEY</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            How CampusOS Powers Your University
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            How CampusOS Unifies Your University Experience
           </h2>
 
-          <p className="text-sm sm:text-base text-slate-600">
-            Tailored journeys for attendees and organizers built on an auditable, role-based infrastructure.
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+            A three-step progression from discovering activities to validating verified student achievements.
           </p>
+        </RevealOnScroll>
 
-          {/* Persona Switcher Toggle */}
-          <div className="inline-flex p-1 rounded-2xl bg-white border border-slate-200 shadow-xs">
-            <button
-              onClick={() => setActivePersona("student")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                activePersona === "student"
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <GraduationCap className="w-4 h-4" />
-              <span>For Students & Attendees</span>
-            </button>
-
-            <button
-              onClick={() => setActivePersona("admin")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                activePersona === "admin"
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <ShieldAlert className="w-4 h-4" />
-              <span>For Faculty & Club Admins</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Steps Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {activeSteps.map((step, idx) => {
+        {/* 3-Step Sequence Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          {steps.map((step, idx) => {
             const Icon = step.icon;
             return (
-              <div
+              <RevealOnScroll
                 key={step.title}
-                className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative group"
+                delay={idx * 150}
+                className="h-full"
               >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                      <Icon className="w-5 h-5" />
+                <div
+                  className={`h-full bg-slate-50/70 hover:bg-white rounded-3xl p-8 border ${step.accent.border} shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-8 relative group`}
+                >
+                  <div className="space-y-6">
+                    {/* Top Row: Number badge and Icon */}
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-xs font-bold font-mono px-3 py-1 rounded-xl border ${step.accent.number}`}
+                      >
+                        STEP {step.stepNumber}
+                      </span>
+                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center">
+                        <Icon className={`w-5 h-5 ${step.accent.icon}`} />
+                      </div>
                     </div>
-                    <span className="text-xs font-bold font-mono text-slate-400">
-                      0{idx + 1}
-                    </span>
+
+                    {/* Step Title & Description */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold tracking-wider uppercase text-slate-400">
+                        {step.title}
+                      </p>
+                      <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+                        {step.headline}
+                      </h3>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
+
+                    {/* Product Concept Highlights */}
+                    <ul className="space-y-2 pt-2 border-t border-slate-200/60">
+                      {step.highlights.map((item) => (
+                        <li key={item} className="flex items-center gap-2 text-xs text-slate-600">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <h3 className="font-bold text-base text-slate-900">{step.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed">
-                      {step.description}
-                    </p>
+                  {/* Action Link */}
+                  <div className="pt-4 border-t border-slate-200/60">
+                    <Link
+                      href={step.href}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-900 group-hover:text-blue-600 transition-colors"
+                    >
+                      <span>{step.actionText}</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                    </Link>
                   </div>
                 </div>
-
-                <div className="pt-3 border-t border-slate-100">
-                  <Link
-                    href={step.href}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-                  >
-                    <span>{step.action}</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
-                </div>
-              </div>
+              </RevealOnScroll>
             );
           })}
         </div>
@@ -172,4 +152,3 @@ export function CampusWorkflows() {
     </section>
   );
 }
-
