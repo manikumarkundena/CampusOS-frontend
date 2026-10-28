@@ -1,121 +1,137 @@
+"use client";
+
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, Calendar, ArrowRight, ShieldCheck, QrCode, Search } from "lucide-react";
+import {
+  Compass,
+  ArrowRight,
+  ShieldCheck,
+  Calendar,
+  Users,
+  Briefcase,
+  Award,
+  Sparkles,
+} from "lucide-react";
+import { RotatingHeadline } from "./RotatingHeadline";
 
 export function HeroSection() {
+  const features = [
+    {
+      title: "Campus Events",
+      description: "Discover workshops, hackathons, and sessions published across departments.",
+      icon: Calendar,
+      href: "/events",
+      accent: "text-blue-600 bg-blue-50 border-blue-100",
+    },
+    {
+      title: "Clubs & Communities",
+      description: "Connect with verified student societies, technical guilds, and student groups.",
+      icon: Users,
+      href: "/clubs",
+      accent: "text-indigo-600 bg-indigo-50 border-indigo-100",
+    },
+    {
+      title: "Recruitment Opportunities",
+      description: "Apply for club executive roles and committee positions with structured applications.",
+      icon: Briefcase,
+      href: "/recruitment",
+      accent: "text-violet-600 bg-violet-50 border-violet-100",
+    },
+    {
+      title: "Digital Certificates",
+      description: "Earn official event credentials and verify authenticity through open lookup codes.",
+      icon: Award,
+      href: "/verify",
+      accent: "text-sky-600 bg-sky-50 border-sky-100",
+    },
+  ];
+
   return (
-    <section className="relative overflow-hidden pt-8 pb-16 lg:pt-14 lg:pb-24 bg-campus-grid">
-      {/* Background radial glow */}
-      <div className="absolute inset-0 bg-radial-glow pointer-events-none" />
+    <section className="relative overflow-hidden bg-white border-b border-slate-200/80">
+      {/* Soft, calm radial background lighting without graph-paper grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(circle at 50% 18%, rgba(239, 246, 255, 0.7) 0%, rgba(255, 255, 255, 1) 75%)",
+        }}
+      />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* Left Column: Headline and CTAs */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            {/* Pill Announcement */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 border border-blue-200/80 text-blue-700 text-xs font-semibold shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
-              <span>Next-Generation Intelligent Campus Operating System</span>
-            </div>
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28 flex flex-col items-center justify-center text-center">
+        {/* Eyebrow Announcement */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold mb-6 shadow-2xs">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+          <span>THE CONNECTED CAMPUS PLATFORM</span>
+        </div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
-              Your campus. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
-                One connected experience.
-              </span>
-            </h1>
+        {/* Centered Headline with Rotating Final Phrase */}
+        <div className="max-w-4xl mx-auto">
+          <RotatingHeadline />
+        </div>
 
-            {/* Supporting Copy */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              Discover verified campus events, join student clubs, track cryptographic attendance,
-              and manage your university journey on a single unified platform.
-            </p>
+        {/* Supporting Copy */}
+        <p className="mt-6 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+          Discover campus events, connect with clubs, manage opportunities, and verify digital credentials through one unified platform.
+        </p>
 
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
-              <Link
-                href="/events"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md shadow-blue-500/20 transition-all hover:-translate-y-0.5"
-              >
-                <Calendar className="w-4 h-4" />
-                <span>Explore Events</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/clubs"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-medium border border-slate-200 shadow-xs transition-all hover:border-slate-300 hover:-translate-y-0.5"
-              >
-                <span>Browse Student Clubs</span>
-              </Link>
-              <Link
-                href="/verify"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3.5 rounded-xl text-slate-600 hover:text-blue-600 text-sm font-medium transition-colors"
-              >
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Verify Certificate</span>
-              </Link>
-            </div>
+        {/* Prominent Action Group */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+          <Link
+            href="/events"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition-all hover:-translate-y-0.5"
+          >
+            <Compass className="w-4 h-4" />
+            <span>Explore Campus</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
 
-            {/* Institutional Trust Highlights */}
-            <div className="pt-6 border-t border-slate-200/80 grid grid-cols-3 gap-4 max-w-xl mx-auto lg:mx-0 text-left">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                  <ShieldCheck className="w-4 h-4 text-blue-600" />
-                  <span>Tamper-Proof</span>
-                </div>
-                <p className="text-[11px] text-slate-500">Verified digital credentialing</p>
-              </div>
+          <Link
+            href="/auth/register"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-sm font-semibold border border-slate-200 shadow-2xs transition-all hover:border-slate-300 hover:-translate-y-0.5"
+          >
+            <span>Get Started</span>
+          </Link>
 
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                  <QrCode className="w-4 h-4 text-indigo-600" />
-                  <span>QR Attendance</span>
-                </div>
-                <p className="text-[11px] text-slate-500">Dynamic session verification</p>
-              </div>
+          <Link
+            href="/verify"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3.5 rounded-xl text-slate-600 hover:text-blue-600 text-sm font-medium transition-colors"
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span>Verify Certificate</span>
+          </Link>
+        </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                  <Sparkles className="w-4 h-4 text-violet-600" />
-                  <span>Role-Based</span>
-                </div>
-                <p className="text-[11px] text-slate-500">Faculty & club administration</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Original Generated Architectural Campus Visual (Asset A) */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-lg lg:max-w-none rounded-3xl p-2 bg-gradient-to-b from-blue-200/50 via-indigo-100/30 to-purple-100/50 shadow-xl shadow-blue-500/10 border border-white/80">
-              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-slate-100">
-                <Image
-                  src="/images/campus-hero.jpg"
-                  alt="Futuristic university campus with crystalline glass towers and pedestrian bridges over a tranquil lake at twilight"
-                  fill
-                  priority
-                  className="object-cover object-center transition-transform duration-700 hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-                {/* Subtle soft gradient overlay to guarantee light tone harmony */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent pointer-events-none" />
-
-                {/* Floating pill over image */}
-                <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md rounded-xl p-3 border border-white/60 shadow-lg flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <div>
-                      <p className="font-semibold text-slate-900">Campus Innovation Complex</p>
-                      <p className="text-[10px] text-slate-500">Intelligent venue & hub integration</p>
+        {/* Four Restrained Product Feature Summaries Without Illustrations */}
+        <div className="mt-16 sm:mt-20 pt-10 border-t border-slate-200/80 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-left">
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <Link
+                  key={feature.title}
+                  href={feature.href}
+                  className="group p-5 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 shadow-2xs hover:border-blue-200 hover:shadow-xs transition-all flex flex-col justify-between space-y-3"
+                >
+                  <div className="space-y-3">
+                    <div className={`w-9 h-9 rounded-xl border flex items-center justify-center ${feature.accent}`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-1">
+                      <h2 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                        {feature.title}
+                      </h2>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        {feature.description}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-                    Live Campus
-                  </span>
-                </div>
-              </div>
-            </div>
+
+                  <div className="pt-2 flex items-center gap-1 text-xs font-semibold text-blue-600 opacity-80 group-hover:opacity-100">
+                    <span>Explore</span>
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

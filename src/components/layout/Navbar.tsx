@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
@@ -19,7 +19,6 @@ import {
   LogOut,
   Bell,
   LayoutDashboard,
-  ShieldAlert,
 } from "lucide-react";
 
 export function Navbar() {
@@ -29,6 +28,8 @@ export function Navbar() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,7 +50,7 @@ export function Navbar() {
 
     checkHealth();
 
-    // Recheck every 30 seconds to automatically transition if Render backend wakes up
+    // Recheck every 30 seconds to automatically transition if cloud backend completes wake-up
     const interval = setInterval(checkHealth, 30000);
 
     return () => {
@@ -71,6 +72,28 @@ export function Navbar() {
     }
   }, [isAuthenticated]);
 
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setUserDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setUserDropdownOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const navLinks = [
     { name: "Events", href: "/events", icon: Calendar },
     { name: "Clubs", href: "/clubs", icon: Users },
@@ -80,15 +103,24 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md transition-all">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left: Brand */}
-          <div className="flex items-center gap-6">
+          {/* Left: Brand & Truthful Backend Status */}
+          <div className="flex items-center gap-5">
             <CampusBrand size="md" />
 
-            {/* Live Backend Connection Indicator */}
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/80 border border-slate-200 text-xs font-medium text-slate-600">
+            {/* Truthful Live Backend Status Pill */}
+            <div
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/90 border border-slate-200/90 text-xs font-medium text-slate-600"
+              title={
+                isBackendHealthy === true
+                  ? "Spring Boot backend API is connected and responding"
+                  : isBackendHealthy === false
+                  ? "Backend service is unreachable. Automatic retry every 30s."
+                  : "Checking backend connectivity..."
+              }
+            >
               <span
                 className={`w-2 h-2 rounded-full ${
                   isBackendHealthy === true
@@ -98,12 +130,12 @@ export function Navbar() {
                     : "bg-amber-400 animate-pulse"
                 }`}
               />
-              <span>
+              <span className="text-[11px] font-semibold text-slate-700">
                 {isBackendHealthy === true
                   ? "Live API"
                   : isBackendHealthy === false
                   ? "API Offline"
-                  : "Connecting..."}
+                  : "Checking API..."}
               </span>
             </div>
           </div>
@@ -117,13 +149,13 @@ export function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                     isActive
-                      ? "text-blue-600 bg-blue-50/80 font-semibold"
+                      ? "text-blue-600 bg-blue-50/80 shadow-xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
                 >
-                  <Icon className="w-4 h-4 opacity-70" />
+                  <Icon className="w-3.5 h-3.5 opacity-70" />
                   <span>{link.name}</span>
                 </Link>
               );
@@ -136,9 +168,9 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
                 >
-                  <LayoutDashboard className="w-4 h-4 text-blue-600" />
+                  <LayoutDashboard className="w-3.5 h-3.5 text-blue-600" />
                   <span>Dashboard</span>
                 </Link>
 
@@ -146,43 +178,43 @@ export function Navbar() {
                 <Link
                   href="/dashboard?tab=notifications"
                   aria-label="Notifications"
-                  className="relative p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className="relative p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-4 h-4" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-blue-600 rounded-full">
+                    <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-blue-600 rounded-full">
                       {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                   )}
                 </Link>
 
                 {/* User Dropdown */}
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                     className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full border border-slate-200 bg-white hover:border-blue-400 transition-all focus:outline-none"
                     aria-expanded={userDropdownOpen}
                   >
-                    <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold uppercase">
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold uppercase">
                       {user.fullName ? user.fullName[0] : "U"}
                     </div>
-                    <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate">
+                    <span className="text-xs font-semibold text-slate-800 max-w-[120px] truncate">
                       {user.fullName}
                     </span>
                   </button>
 
                   {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white border border-slate-200 shadow-lg py-1.5 z-50 text-sm">
+                    <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 text-xs">
                       <div className="px-4 py-2 border-b border-slate-100">
-                        <p className="font-semibold text-slate-800 truncate">{user.fullName}</p>
-                        <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                        <p className="font-bold text-slate-900 truncate">{user.fullName}</p>
+                        <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
                         <div className="mt-1.5 flex flex-wrap gap-1">
                           {user.roles?.map((r) => {
                             const badge = getRoleBadge(r);
                             return (
                               <span
                                 key={r}
-                                className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${badge.className}`}
+                                className={`text-[9px] px-1.5 py-0.5 rounded border font-semibold ${badge.className}`}
                               >
                                 {badge.label}
                               </span>
@@ -194,18 +226,18 @@ export function Navbar() {
                       <Link
                         href="/profile"
                         onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-50"
+                        className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-50 font-medium"
                       >
-                        <User className="w-4 h-4 text-slate-400" />
+                        <User className="w-3.5 h-3.5 text-slate-400" />
                         Profile & Settings
                       </Link>
 
                       <Link
                         href="/dashboard"
                         onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-50"
+                        className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-50 font-medium"
                       >
-                        <LayoutDashboard className="w-4 h-4 text-slate-400" />
+                        <LayoutDashboard className="w-3.5 h-3.5 text-slate-400" />
                         My Dashboard
                       </Link>
 
@@ -214,9 +246,9 @@ export function Navbar() {
                           setUserDropdownOpen(false);
                           logout();
                         }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-rose-600 hover:bg-rose-50 text-left border-t border-slate-100"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-rose-600 hover:bg-rose-50 text-left border-t border-slate-100 font-medium"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-3.5 h-3.5" />
                         Sign Out
                       </button>
                     </div>
@@ -227,13 +259,13 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/auth/login"
-                  className="px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-4 py-1.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-all shadow-blue-500/20"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-all shadow-blue-500/20"
                 >
                   Register
                 </Link>
@@ -245,10 +277,10 @@ export function Navbar() {
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -256,18 +288,21 @@ export function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-6 space-y-3">
+        <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-6 space-y-4 shadow-lg">
           <nav className="flex flex-col space-y-1">
             {navLinks.map((link) => {
               const Icon = link.icon;
+              const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50"
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                    isActive ? "bg-blue-50 text-blue-600" : "text-slate-700 hover:bg-slate-50"
+                  }`}
                 >
-                  <Icon className="w-5 h-5 text-slate-400" />
+                  <Icon className="w-4 h-4 text-slate-400" />
                   <span>{link.name}</span>
                 </Link>
               );
@@ -276,8 +311,8 @@ export function Navbar() {
 
           <div className="pt-3 border-t border-slate-100 space-y-3">
             {/* Mobile Connection Indicator */}
-            <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600">
-              <span className="font-medium">Backend Status</span>
+            <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+              <span className="font-medium">Backend API</span>
               <div className="flex items-center gap-1.5 font-semibold">
                 <span
                   className={`w-2 h-2 rounded-full ${
@@ -297,23 +332,24 @@ export function Navbar() {
                 </span>
               </div>
             </div>
+
             {isAuthenticated && user ? (
               <div className="space-y-2">
-                <div className="px-3 py-2 bg-slate-50 rounded-lg">
-                  <p className="font-semibold text-slate-800">{user.fullName}</p>
-                  <p className="text-xs text-slate-500">{user.email}</p>
+                <div className="px-3 py-2 bg-slate-50 rounded-xl">
+                  <p className="font-bold text-slate-900 text-xs">{user.fullName}</p>
+                  <p className="text-[11px] text-slate-500">{user.email}</p>
                 </div>
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50"
+                  className="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50"
+                  className="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Profile & Settings
                 </Link>
@@ -322,24 +358,24 @@ export function Navbar() {
                     setMobileMenuOpen(false);
                     logout();
                   }}
-                  className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-rose-600 hover:bg-rose-50"
+                  className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50"
                 >
                   Sign Out
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 pt-1">
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-800"
+                  className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+                  className="w-full text-center py-2.5 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 shadow-sm shadow-blue-500/20"
                 >
                   Register Student Account
                 </Link>

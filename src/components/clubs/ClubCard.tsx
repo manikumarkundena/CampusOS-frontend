@@ -17,7 +17,7 @@ export function ClubCard({ club }: { club: ClubItem }) {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 bg-campus-grid opacity-30 pointer-events-none" />
+            <div className="absolute inset-0 bg-slate-100 opacity-60 pointer-events-none" />
           )}
 
           {/* Category Pill */}

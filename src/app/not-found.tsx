@@ -5,7 +5,7 @@ import { ArrowLeft, Home, Compass } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center py-16 px-4 bg-campus-grid">
+    <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center py-16 px-4 bg-slate-50/60">
       <div className="glass-panel max-w-md w-full p-8 sm:p-10 rounded-3xl border border-slate-200 text-center space-y-6 shadow-lg">
         <div className="flex justify-center">
           <CampusBrand size="lg" />

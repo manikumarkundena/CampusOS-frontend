@@ -76,7 +76,7 @@ function VerifyContent() {
   const isNetworkOrServerError = errorStatus === 0 || (errorStatus !== null && errorStatus >= 500);
 
   return (
-    <div className="min-h-screen py-12 bg-campus-grid">
+    <div className="min-h-screen py-12 bg-slate-50/60">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">

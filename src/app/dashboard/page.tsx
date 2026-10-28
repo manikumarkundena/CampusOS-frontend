@@ -37,6 +37,7 @@ import {
   Users,
   Eye,
   X,
+  ShieldCheck,
 } from "lucide-react";
 
 function DashboardContent() {
@@ -262,148 +263,164 @@ function DashboardContent() {
             </div>
           </div>
 
-          {canManageEvents && (
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/verify"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200 shadow-2xs transition-all"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Verify Credential</span>
+            </Link>
+
+            {canManageEvents && (
               <Link
                 href="/dashboard/create-event"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all"
               >
-                <PlusCircle className="w-4 h-4" />
+                <PlusCircle className="w-3.5 h-3.5" />
                 <span>Create Event Draft</span>
               </Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 scrollbar-none text-xs font-semibold">
-          <button
-            onClick={() => setActiveTab("registrations")}
-            className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-              activeTab === "registrations"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-            }`}
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>My Registrations</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("certificates")}
-            className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-              activeTab === "certificates"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-            }`}
-          >
-            <Award className="w-3.5 h-3.5" />
-            <span>My Certificates</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("applications")}
-            className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-              activeTab === "applications"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-            }`}
-          >
-            <Briefcase className="w-3.5 h-3.5" />
-            <span>My Applications</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("recommendations")}
-            className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-              activeTab === "recommendations"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Recommended</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("attendance")}
-            className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-              activeTab === "attendance"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-            }`}
-          >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>QR Attendance</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("notifications")}
-            className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-              activeTab === "notifications"
-                ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-            }`}
-          >
-            <Bell className="w-3.5 h-3.5" />
-            <span>Notifications</span>
-          </button>
-
-          {(isFaculty || isSuperAdmin) && (
+        {/* Navigation Tabs Bar */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+            {/* Student Workspaces */}
             <button
-              onClick={() => setActiveTab("approvals")}
-              className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-                activeTab === "approvals"
+              onClick={() => setActiveTab("registrations")}
+              className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "registrations"
                   ? "bg-blue-600 text-white shadow-xs"
                   : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
               }`}
             >
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>Event Approvals</span>
+              <Calendar className="w-3.5 h-3.5" />
+              <span>My Registrations</span>
             </button>
-          )}
 
-          {canManageEvents && (
             <button
-              onClick={() => setActiveTab("certificate-studio")}
-              className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-                activeTab === "certificate-studio"
+              onClick={() => setActiveTab("certificates")}
+              className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "certificates"
                   ? "bg-blue-600 text-white shadow-xs"
                   : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Certificate Studio (Admin)</span>
+              <Award className="w-3.5 h-3.5" />
+              <span>My Certificates</span>
             </button>
-          )}
 
-          {isSuperAdmin && (
-            <>
+            <button
+              onClick={() => setActiveTab("applications")}
+              className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "applications"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5" />
+              <span>My Applications</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("recommendations")}
+              className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "recommendations"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Recommended</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("attendance")}
+              className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "attendance"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+              }`}
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              <span>QR Attendance</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("notifications")}
+              className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "notifications"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+              }`}
+            >
+              <Bell className="w-3.5 h-3.5" />
+              <span>Notifications</span>
+            </button>
+
+            {/* Visual separator for elevated/admin workspaces */}
+            {(canManageEvents || isFaculty || isSuperAdmin) && (
+              <div className="h-5 w-px bg-slate-300 mx-1 shrink-0" />
+            )}
+
+            {canManageEvents && (
               <button
-                onClick={() => setActiveTab("analytics")}
-                className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-                  activeTab === "analytics"
+                onClick={() => setActiveTab("certificate-studio")}
+                className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                  activeTab === "certificate-studio"
+                    ? "bg-indigo-600 text-white shadow-xs"
+                    : "bg-indigo-50/80 text-indigo-700 hover:bg-indigo-100 border border-indigo-200"
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>Certificate Studio</span>
+              </button>
+            )}
+
+            {(isFaculty || isSuperAdmin) && (
+              <button
+                onClick={() => setActiveTab("approvals")}
+                className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                  activeTab === "approvals"
                     ? "bg-blue-600 text-white shadow-xs"
                     : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
                 }`}
               >
-                <BarChart3 className="w-3.5 h-3.5" />
-                <span>Campus Analytics</span>
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>Event Approvals</span>
               </button>
+            )}
 
-              <button
-                onClick={() => setActiveTab("roles")}
-                className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
-                  activeTab === "roles"
-                    ? "bg-blue-600 text-white shadow-xs"
-                    : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                <Users className="w-3.5 h-3.5" />
-                <span>Role Requests</span>
-              </button>
-            </>
-          )}
+            {isSuperAdmin && (
+              <>
+                <button
+                  onClick={() => setActiveTab("analytics")}
+                  className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                    activeTab === "analytics"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  }`}
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>Campus Analytics</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("roles")}
+                  className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                    activeTab === "roles"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Role Requests</span>
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Tab Content Display */}

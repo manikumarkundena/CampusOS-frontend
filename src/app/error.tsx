@@ -17,7 +17,7 @@ export default function GlobalErrorPage({
   }, [error]);
 
   return (
-    <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center py-16 px-4 bg-campus-grid">
+    <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center py-16 px-4 bg-slate-50/60">
       <div className="glass-panel max-w-md w-full p-8 rounded-3xl border border-rose-200 text-center space-y-6 shadow-lg bg-white/90">
         <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 mx-auto">
           <AlertCircle className="w-7 h-7" />

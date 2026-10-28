@@ -29,7 +29,15 @@ export function FeaturedEvents() {
   };
 
   useEffect(() => {
-    fetchEvents();
+    let mounted = true;
+    queueMicrotask(() => {
+      if (mounted) {
+        fetchEvents();
+      }
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (

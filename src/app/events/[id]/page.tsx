@@ -177,7 +177,7 @@ function EventDetailContent({
               />
             ) : (
               <div className="w-full h-full flex flex-col justify-end p-6 sm:p-10 text-white relative">
-                <div className="absolute inset-0 bg-campus-grid opacity-25 pointer-events-none" />
+                <div className="absolute inset-0 bg-slate-900/30 pointer-events-none" />
                 <div className="relative z-10 space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20">

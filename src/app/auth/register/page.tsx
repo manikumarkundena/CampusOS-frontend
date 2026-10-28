@@ -5,7 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { CampusBrand } from "@/components/layout/CampusBrand";
-import { UserPlus, AlertCircle, Lock, Mail, User, GraduationCap, Building, Eye, EyeOff } from "lucide-react";
+import {
+  UserPlus,
+  AlertCircle,
+  Lock,
+  Mail,
+  User,
+  GraduationCap,
+  Building,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  ArrowRight,
+} from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,6 +39,11 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
+    if (!fullName.trim() || !email.trim() || !password) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
     if (password.length < 8) {
       setError("Password must be at least 8 characters long.");
       return;
@@ -36,8 +53,8 @@ export default function RegisterPage() {
 
     try {
       await register({
-        fullName,
-        email,
+        fullName: fullName.trim(),
+        email: email.trim(),
         password,
         studentId: studentId.trim() || undefined,
         department: department.trim() || undefined,
@@ -46,7 +63,10 @@ export default function RegisterPage() {
       });
       router.push("/dashboard");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Registration failed. Please check your information.";
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please check your information or connectivity.";
       setError(msg);
     } finally {
       setLoading(false);
@@ -54,27 +74,33 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-campus-grid">
-      <div className="w-full max-w-lg space-y-8 glass-panel p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-lg">
+    <div className="min-h-[calc(100vh-14rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50/60 relative overflow-hidden">
+      {/* Soft Ambient Background Lighting */}
+      <div className="absolute inset-0 bg-radial-glow opacity-60 pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-lg space-y-6 bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-slate-200/90 shadow-xl shadow-blue-900/5">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-3">
             <CampusBrand size="lg" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-            Create Student Account
-          </h2>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+            Create University Profile
+          </h1>
           <p className="text-xs text-slate-500">
-            Register your university profile to discover events and join student societies.
+            Register your institutional student account to RSVP for events, earn credentials, and join clubs.
           </p>
         </div>
 
         {/* Server Error Alert */}
         {error && (
-          <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-xs text-rose-800">
+          <div
+            role="alert"
+            className="rounded-2xl bg-rose-50 border border-rose-200 p-4 flex items-start gap-3 text-xs text-rose-800 animate-fadeIn"
+          >
             <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold">Registration Notice</p>
+              <p className="font-bold">Registration Notice</p>
               <p className="mt-0.5">{error}</p>
             </div>
           </div>
@@ -82,8 +108,11 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Full Name */}
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-700">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reg-fullname"
+              className="block text-xs font-semibold text-slate-700"
+            >
               Full Legal Name <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -91,8 +120,10 @@ export default function RegisterPage() {
                 <User className="w-4 h-4" />
               </div>
               <input
+                id="reg-fullname"
                 type="text"
                 required
+                autoComplete="name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Aarav Sharma"
@@ -102,8 +133,11 @@ export default function RegisterPage() {
           </div>
 
           {/* Email */}
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-700">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reg-email"
+              className="block text-xs font-semibold text-slate-700"
+            >
               University Email <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -111,19 +145,24 @@ export default function RegisterPage() {
                 <Mail className="w-4 h-4" />
               </div>
               <input
+                id="reg-email"
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="aarav.s@campusos.internal"
+                placeholder="student@campusos.internal"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
           </div>
 
           {/* Password */}
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-700">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reg-password"
+              className="block text-xs font-semibold text-slate-700"
+            >
               Password (Min. 8 characters) <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -131,9 +170,11 @@ export default function RegisterPage() {
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="reg-password"
                 type={showPassword ? "text" : "password"}
                 required
                 minLength={8}
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -143,6 +184,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -151,11 +193,15 @@ export default function RegisterPage() {
 
           {/* Student ID & Graduation Year */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="block text-xs font-semibold text-slate-700">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="reg-studentid"
+                className="block text-xs font-semibold text-slate-700"
+              >
                 Student ID / Roll No
               </label>
               <input
+                id="reg-studentid"
                 type="text"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
@@ -164,8 +210,11 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-xs font-semibold text-slate-700">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="reg-gradyear"
+                className="block text-xs font-semibold text-slate-700"
+              >
                 Graduation Year
               </label>
               <div className="relative">
@@ -173,6 +222,7 @@ export default function RegisterPage() {
                   <GraduationCap className="w-4 h-4" />
                 </div>
                 <input
+                  id="reg-gradyear"
                   type="number"
                   value={graduationYear}
                   onChange={(e) => setGraduationYear(Number(e.target.value))}
@@ -183,8 +233,11 @@ export default function RegisterPage() {
           </div>
 
           {/* Department */}
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-700">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reg-dept"
+              className="block text-xs font-semibold text-slate-700"
+            >
               Academic Department
             </label>
             <div className="relative">
@@ -192,6 +245,7 @@ export default function RegisterPage() {
                 <Building className="w-4 h-4" />
               </div>
               <input
+                id="reg-dept"
                 type="text"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
@@ -202,11 +256,15 @@ export default function RegisterPage() {
           </div>
 
           {/* Interests */}
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-700">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reg-interests"
+              className="block text-xs font-semibold text-slate-700"
+            >
               Interests & Keywords (Optional)
             </label>
             <input
+              id="reg-interests"
               type="text"
               value={interests}
               onChange={(e) => setInterests(e.target.value)}
@@ -218,7 +276,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5"
+            className="w-full mt-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5"
           >
             {loading ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -226,13 +284,26 @@ export default function RegisterPage() {
               <>
                 <UserPlus className="w-4 h-4" />
                 <span>Create Student Account</span>
+                <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
+        {/* Institutional RBAC Explanatory Note */}
+        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
+          <div className="flex items-center gap-1.5 font-semibold text-slate-700">
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+            <span>Role-Based Institutional Governance</span>
+          </div>
+          <p>
+            Club Admin and Faculty Coordinator privileges are assigned through verified access requests
+            and supervised by Institutional Administrators.
+          </p>
+        </div>
+
         <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-500">
-          <span>Already registered? </span>
+          <span>Already have an account? </span>
           <Link
             href="/auth/login"
             className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"

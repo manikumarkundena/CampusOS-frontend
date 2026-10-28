@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CampusVoicePost } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { formatDate } from "@/lib/utils";
-import { MessageSquare, ThumbsUp, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
+import { MessageSquare, ThumbsUp, MessageCircle, ArrowRight } from "lucide-react";
 
 export function CampusVoicePreview() {
   const [posts, setPosts] = useState<CampusVoicePost[]>([]);

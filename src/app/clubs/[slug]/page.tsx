@@ -120,7 +120,7 @@ function ClubDetailContent({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={club.bannerUrl} alt={club.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="absolute inset-0 bg-campus-grid opacity-20 pointer-events-none" />
+              <div className="absolute inset-0 bg-slate-100 opacity-60 pointer-events-none" />
             )}
           </div>
 
