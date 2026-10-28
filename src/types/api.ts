@@ -481,3 +481,139 @@ export interface ApiError {
   message?: string;
   path?: string;
 }
+
+// ==========================================
+// Certificate Management Types
+// ==========================================
+
+export interface CertificateFieldConfig {
+  fieldType: 'RECIPIENT_NAME' | 'EVENT_TITLE' | 'CLUB_NAME' | 'ISSUE_DATE' | 'CERTIFICATE_NUMBER' | 'QR_CODE' | 'CUSTOM_TEXT';
+  label: string;
+  defaultValue?: string;
+  xPercent: number;
+  yPercent: number;
+  fontFamily?: 'HELVETICA' | 'TIMES_ROMAN' | 'COURIER';
+  fontSize?: number;
+  fontStyle?: 'REGULAR' | 'BOLD' | 'ITALIC';
+  colorHex?: string;
+  alignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  qrSizePt?: number;
+  customText?: string;
+}
+
+export interface CertificateTemplateResponse {
+  id: string;
+  clubId: string;
+  clubName?: string;
+  name: string;
+  description?: string;
+  backgroundFileId?: string;
+  backgroundUrl?: string;
+  orientation: 'LANDSCAPE' | 'PORTRAIT';
+  canvasWidth: number;
+  canvasHeight: number;
+  fieldsConfigJson?: string;
+  fields?: CertificateFieldConfig[];
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CertificateTemplateSummaryDto {
+  id: string;
+  name: string;
+  orientation: 'LANDSCAPE' | 'PORTRAIT';
+  active: boolean;
+}
+
+export interface RecipientPreviewDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  studentId?: string;
+}
+
+export interface SkippedRecipientDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  reason: string;
+}
+
+export interface BulkIssuePreviewResponse {
+  eventId: string;
+  eventTitle: string;
+  clubId: string;
+  clubName: string;
+  totalAttendees: number;
+  eligibleCount: number;
+  alreadyIssuedCount: number;
+  skippedCount: number;
+  eligibleRecipients: RecipientPreviewDto[];
+  skippedRecipients: SkippedRecipientDto[];
+  availableTemplates: CertificateTemplateSummaryDto[];
+}
+
+export interface BulkIssueRequest {
+  templateId?: string | null;
+  sendEmail?: boolean;
+  emailSubject?: string;
+  emailBody?: string;
+}
+
+export interface BulkIssueResponse {
+  eventId: string;
+  batchId?: string;
+  deliveryStatus: string;
+  newlyIssuedCount: number;
+  alreadyIssuedCount: number;
+  totalEligible: number;
+  certificates: Certificate[];
+}
+
+export interface RecipientDeliveryStatusDto {
+  id: string;
+  certificateId: string;
+  recipientEmail: string;
+  recipientName: string;
+  status: 'QUEUED' | 'SENDING' | 'SENT' | 'FAILED';
+  attempts: number;
+  lastAttemptAt?: string | null;
+  sentAt?: string | null;
+  errorMessage?: string | null;
+}
+
+export interface BatchDeliveryStatusResponse {
+  batchId: string;
+  eventId: string;
+  eventTitle: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'PARTIALLY_FAILED' | 'FAILED';
+  totalCount: number;
+  queuedCount: number;
+  sentCount: number;
+  deliveredCount: number;
+  failedCount: number;
+  progressPercentage: number;
+  errorSummary?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  recipients: RecipientDeliveryStatusDto[];
+}
+
+export interface CertificatePreviewRequest {
+  templateId?: string;
+  sampleRecipientName?: string;
+  sampleEventTitle?: string;
+  sampleIssueDate?: string;
+  sampleCertificateNumber?: string;
+  sampleVerificationCode?: string;
+  fieldsConfigJson?: string;
+  orientation?: 'LANDSCAPE' | 'PORTRAIT';
+}
+
+export interface UpdateCertificateTemplateRequest {
+  name?: string;
+  description?: string;
+  fieldsConfigJson?: string;
+  active?: boolean;
+}

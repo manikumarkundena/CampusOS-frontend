@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicCertificateVerification } from "@/types/api";
 import { api } from "@/lib/api-client";
 import { formatDate } from "@/lib/utils";
@@ -14,38 +15,65 @@ import {
   Building,
   User,
   Calendar,
+  WifiOff,
 } from "lucide-react";
 
-export default function CertificateVerificationPage() {
-  const [code, setCode] = useState("");
+function VerifyContent() {
+  const searchParams = useSearchParams();
+  const initialCode = searchParams.get("code") || "";
+
+  const [code, setCode] = useState(initialCode);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PublicCertificateVerification | null>(null);
   const [searched, setSearched] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorStatus, setErrorStatus] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!code.trim()) return;
+  const runVerification = async (codeToVerify: string) => {
+    if (!codeToVerify.trim()) return;
 
     setLoading(true);
-    setError(null);
+    setErrorMessage(null);
+    setErrorStatus(null);
     setSearched(true);
 
     try {
-      const res = await api.certificates.verify(code.trim());
+      const res = await api.certificates.verify(codeToVerify.trim());
       if (res?.data) {
         setResult(res.data);
       } else {
         setResult(null);
+        setErrorStatus(404);
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Certificate verification failed";
-      setError(msg);
       setResult(null);
+      if (err && typeof err === "object" && "status" in err) {
+        const status = Number((err as { status: number }).status);
+        setErrorStatus(status);
+        setErrorMessage(err instanceof Error ? err.message : "Verification request failed");
+      } else {
+        setErrorStatus(0);
+        setErrorMessage(err instanceof Error ? err.message : "Verification service unreachable");
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (initialCode) {
+      queueMicrotask(() => {
+        runVerification(initialCode);
+      });
+    }
+  }, [initialCode]);
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await runVerification(code);
+  };
+
+  const isNetworkOrServerError = errorStatus === 0 || (errorStatus !== null && errorStatus >= 500);
 
   return (
     <div className="min-h-screen py-12 bg-campus-grid">
@@ -79,7 +107,7 @@ export default function CertificateVerificationPage() {
                   required
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="e.g. CERT-2026-XXXXXXXX"
+                  placeholder="e.g. VERIF-XXXXXXXXXXXX"
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono tracking-wider"
                 />
               </div>
@@ -170,13 +198,20 @@ export default function CertificateVerificationPage() {
                     </div>
                   </div>
                 </div>
+              ) : isNetworkOrServerError ? (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-6 text-center text-xs text-amber-800 space-y-2">
+                  <WifiOff className="w-8 h-8 text-amber-600 mx-auto" />
+                  <p className="font-bold text-sm text-amber-900">Verification Service Unavailable</p>
+                  <p className="max-w-md mx-auto text-amber-700">
+                    Unable to reach the CampusOS verification authority. {errorMessage || "Please check your network connection and try again."}
+                  </p>
+                </div>
               ) : (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center text-xs text-slate-500 space-y-1">
                   <FileCheck className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="font-bold text-slate-700">No Verified Record Found</p>
+                  <p className="font-bold text-slate-700">Invalid or Unrecognized Code</p>
                   <p>
-                    The code &ldquo;{code}&rdquo; could not be matched against issued credentials.
-                    Please re-check the entered alphanumeric sequence.
+                    The code &ldquo;{code}&rdquo; does not match any valid certificate in the CampusOS institutional registry.
                   </p>
                 </div>
               )}
@@ -185,5 +220,13 @@ export default function CertificateVerificationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CertificateVerificationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen py-12 flex justify-center items-center"><div className="w-8 h-8 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" /></div>}>
+      <VerifyContent />
+    </Suspense>
   );
 }

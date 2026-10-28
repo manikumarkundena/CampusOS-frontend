@@ -16,9 +16,10 @@ import {
   AttendanceSession,
 } from "@/types/api";
 import { api } from "@/lib/api-client";
-import { formatDate, formatTime, getRegistrationStatusBadge, getStatusBadge, getRoleBadge } from "@/lib/utils";
+import { formatDate, formatTime, getRegistrationStatusBadge, getRoleBadge } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ClubAdminCertificateManager } from "@/components/certificates/ClubAdminCertificateManager";
 import {
   Calendar,
   Award,
@@ -27,18 +28,15 @@ import {
   Sparkles,
   QrCode,
   CheckCircle2,
-  XCircle,
-  Clock,
   Download,
   PlusCircle,
   ShieldAlert,
   BarChart3,
   ExternalLink,
-  Send,
   AlertCircle,
-  RefreshCw,
-  Ticket,
   Users,
+  Eye,
+  X,
 } from "lucide-react";
 
 function DashboardContent() {
@@ -74,6 +72,50 @@ function DashboardContent() {
   const [checkInToken, setCheckInToken] = useState("");
   const [checkInStatus, setCheckInStatus] = useState<string | null>(null);
   const [checkingIn, setCheckingIn] = useState(false);
+
+  // Student Certificate Download & Preview State
+  const [downloadingCertId, setDownloadingCertId] = useState<string | null>(null);
+  const [previewCertBlobUrl, setPreviewCertBlobUrl] = useState<string | null>(null);
+  const [previewCertTitle, setPreviewCertTitle] = useState<string | null>(null);
+
+  const handleDownloadCertificate = async (cert: Certificate) => {
+    setDownloadingCertId(cert.id);
+    try {
+      const blob = await api.certificates.downloadPdfBlob(cert.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `CampusOS_Certificate_${cert.certificateNumber || cert.verificationCode || cert.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to download certificate PDF");
+    } finally {
+      setDownloadingCertId(null);
+    }
+  };
+
+  const handlePreviewCertificate = async (cert: Certificate) => {
+    setPreviewCertTitle(cert.eventTitle || cert.certificateNumber || "Certificate");
+    try {
+      const blob = await api.certificates.downloadPdfBlob(cert.id);
+      const url = window.URL.createObjectURL(blob);
+      setPreviewCertBlobUrl(url);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to load certificate preview");
+      setPreviewCertBlobUrl(null);
+    }
+  };
+
+  const handleCloseCertPreview = () => {
+    if (previewCertBlobUrl) {
+      window.URL.revokeObjectURL(previewCertBlobUrl);
+    }
+    setPreviewCertBlobUrl(null);
+    setPreviewCertTitle(null);
+  };
 
   // Redirect to login if not authenticated after auth loading finishes
   useEffect(() => {
@@ -119,7 +161,9 @@ function DashboardContent() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      loadTabData(activeTab);
+      queueMicrotask(() => {
+        loadTabData(activeTab);
+      });
     }
   }, [isAuthenticated, activeTab, loadTabData]);
 
@@ -319,6 +363,20 @@ function DashboardContent() {
             </button>
           )}
 
+          {canManageEvents && (
+            <button
+              onClick={() => setActiveTab("certificate-studio")}
+              className={`px-4 py-2.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === "certificate-studio"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Certificate Studio (Admin)</span>
+            </button>
+          )}
+
           {isSuperAdmin && (
             <>
               <button
@@ -446,19 +504,34 @@ function DashboardContent() {
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                           <Link
                             href={`/verify?code=${cert.verificationCode}`}
-                            className="text-xs text-slate-600 hover:text-blue-600 font-medium"
+                            className="text-xs text-blue-600 hover:underline font-medium inline-flex items-center gap-1"
                           >
-                            Verify Online
+                            <span>Verify Online</span>
+                            <ExternalLink className="w-3 h-3" />
                           </Link>
-                          <a
-                            href={api.certificates.downloadPdfUrl(cert.id)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                            <span>Download PDF</span>
-                          </a>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handlePreviewCertificate(cert)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium"
+                              title="Preview certificate"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-blue-600" />
+                              <span>Preview</span>
+                            </button>
+                            <button
+                              onClick={() => handleDownloadCertificate(cert)}
+                              disabled={downloadingCertId === cert.id}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs disabled:opacity-50"
+                              title="Download official PDF document"
+                            >
+                              {downloadingCertId === cert.id ? (
+                                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              ) : (
+                                <Download className="w-3.5 h-3.5" />
+                              )}
+                              <span>Download PDF</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -881,6 +954,47 @@ function DashboardContent() {
                 )}
               </div>
             )}
+            {/* Tab: Certificate Studio (Club Admin / Faculty / Super Admin) */}
+            {activeTab === "certificate-studio" && canManageEvents && (
+              <ClubAdminCertificateManager />
+            )}
+          </div>
+        )}
+
+        {/* Certificate PDF Quick Preview Modal */}
+        {previewCertBlobUrl && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div className="w-full max-w-4xl bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h4 className="font-bold text-base text-slate-900">{previewCertTitle}</h4>
+                  <p className="text-[11px] font-mono text-slate-500">Official CampusOS Digital Credential</p>
+                </div>
+                <button
+                  onClick={handleCloseCertPreview}
+                  className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 my-4 bg-slate-100 rounded-2xl overflow-hidden min-h-[460px]">
+                <iframe
+                  src={previewCertBlobUrl}
+                  title="Certificate Document Preview"
+                  className="w-full h-[520px] border-none"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2 text-xs">
+                <button
+                  onClick={handleCloseCertPreview}
+                  className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

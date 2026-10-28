@@ -25,6 +25,13 @@ import {
   ReportPostRequest,
   Certificate,
   PublicCertificateVerification,
+  CertificateTemplateResponse,
+  BulkIssuePreviewResponse,
+  BulkIssueRequest,
+  BulkIssueResponse,
+  BatchDeliveryStatusResponse,
+  CertificatePreviewRequest,
+  UpdateCertificateTemplateRequest,
   RecruitmentDrive,
   RecruitmentPosition,
   RecruitmentApplication,
@@ -205,6 +212,47 @@ async function request<T>(
   }
 
   return {} as T;
+}
+
+async function requestBlob(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<Blob> {
+  const url = resolveUrl(endpoint);
+  const headers = new Headers(options.headers || {});
+  const token = getStoredAccessToken();
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Network error";
+    throw new ApiClientError(
+      `Cannot connect to CampusOS backend service at ${API_BASE_URL}. (${message})`,
+      0
+    );
+  }
+
+  if (!response.ok) {
+    let errorDetail = "An error occurred";
+    let errorCode: string | undefined;
+    try {
+      const errorJson: ApiError = await response.json();
+      errorDetail = errorJson.message || errorJson.errorCode || `Error ${response.status}`;
+      errorCode = errorJson.errorCode;
+    } catch {
+      errorDetail = response.statusText || `HTTP ${response.status}`;
+    }
+    throw new ApiClientError(errorDetail, response.status, errorCode);
+  }
+
+  return response.blob();
 }
 
 export const api = {
@@ -420,12 +468,65 @@ export const api = {
       request<ApiResponse<PagedResponse<Certificate>>>(
         `/api/v1/certificates/my?page=${page}&size=${size}`
       ),
+    downloadPdfBlob: (id: string) =>
+      requestBlob(`/api/v1/certificates/${id}/download`),
+    downloadPdfUrl: (id: string) => `${API_SERVER_ORIGIN}/api/v1/certificates/${id}/download`,
+    getTemplatesForClub: (clubId: string) =>
+      request<ApiResponse<CertificateTemplateResponse[]>>(
+        `/api/v1/certificates/templates/clubs/${clubId}`
+      ),
+    getTemplate: (id: string) =>
+      request<ApiResponse<CertificateTemplateResponse>>(
+        `/api/v1/certificates/templates/${id}`
+      ),
+    createTemplate: (formData: FormData) =>
+      request<ApiResponse<CertificateTemplateResponse>>(`/api/v1/certificates/templates`, {
+        method: "POST",
+        body: formData,
+      }),
+    updateTemplate: (id: string, data: UpdateCertificateTemplateRequest) =>
+      request<ApiResponse<CertificateTemplateResponse>>(`/api/v1/certificates/templates/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    deleteTemplate: (id: string) =>
+      request<ApiResponse<void>>(`/api/v1/certificates/templates/${id}`, {
+        method: "DELETE",
+      }),
+    previewTemplate: (templateId: string, data?: CertificatePreviewRequest) =>
+      requestBlob(`/api/v1/certificates/templates/${templateId}/preview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: data ? JSON.stringify(data) : undefined,
+      }),
+    previewTransient: (data: CertificatePreviewRequest) =>
+      requestBlob(`/api/v1/certificates/templates/preview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    getBulkIssuePreview: (eventId: string) =>
+      request<ApiResponse<BulkIssuePreviewResponse>>(
+        `/api/v1/certificates/events/${eventId}/bulk-preview`
+      ),
+    bulkIssue: (eventId: string, data?: BulkIssueRequest) =>
+      request<ApiResponse<BulkIssueResponse>>(`/api/v1/certificates/events/${eventId}/bulk`, {
+        method: "POST",
+        body: JSON.stringify(data || {}),
+      }),
+    getBatchStatus: (batchId: string) =>
+      request<ApiResponse<BatchDeliveryStatusResponse>>(
+        `/api/v1/certificates/batches/${batchId}`
+      ),
+    retryFailed: (batchId: string) =>
+      request<ApiResponse<BatchDeliveryStatusResponse>>(
+        `/api/v1/certificates/batches/${batchId}/retry-failed`,
+        {
+          method: "POST",
+        }
+      ),
     issue: (eventId: string, userId: string) =>
       request<ApiResponse<Certificate>>(`/api/v1/certificates/events/${eventId}/users/${userId}`, {
-        method: "POST",
-      }),
-    bulkIssue: (eventId: string) =>
-      request<ApiResponse<Certificate[]>>(`/api/v1/certificates/events/${eventId}/bulk`, {
         method: "POST",
       }),
     revoke: (id: string, reason?: string) => {
@@ -434,7 +535,6 @@ export const api = {
         method: "POST",
       });
     },
-    downloadPdfUrl: (id: string) => `${API_SERVER_ORIGIN}/api/v1/certificates/${id}/download`,
   },
 
   // Recruitment
